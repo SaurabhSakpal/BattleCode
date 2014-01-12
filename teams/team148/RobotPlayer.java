@@ -6,31 +6,28 @@ import java.util.*;
 
 public class RobotPlayer
 {
-    static Random rand;
-    
+    static Random rd = new Random();
+    static int last = 0;
 	static Direction dir[] = {Direction.NORTH,Direction.SOUTH,Direction.EAST,Direction.WEST,Direction.NORTH_EAST, Direction.NORTH_WEST,Direction.SOUTH_EAST, Direction.SOUTH_WEST};
 	static int count = 0;
+	static boolean flag = true;
 	public static void run(RobotController rc)
 	{
-            rand=new Random();
 		while(true)
 		{
 			if(rc.getType()==RobotType.HQ)
 			{
 				if(rc.isActive() && rc.senseRobotCount()<25)
 				{
-					
-					count = count +1;
+					int rand = rd.nextInt(100);
 					try
 					{
-						MapLocation loc = rc.getLocation().add(dir[count%8]);
-                                                System.out.println(loc);
+						MapLocation loc = rc.getLocation().add(dir[rand%8]);
 						GameObject go = rc.senseObjectAtLocation(loc);
-                                               
 						if(go==null)
 						{
-							rc.spawn(dir[(count+((int)Math.random()*8))%8]);
-                                                         System.out.println(dir[(count+((int)Math.random()*8)%8)]);
+							System.out.println(rand%8);
+							rc.spawn(dir[rand%8]);
 						}
                                                 
 						else if(go.getTeam()==rc.getTeam().opponent())
@@ -39,9 +36,7 @@ public class RobotPlayer
 							{
 								rc.attackSquare(loc);
 							}
-						}
-                                                
-                                               
+						}                           
 					}
 					catch(Exception e)
 					{
@@ -53,28 +48,29 @@ public class RobotPlayer
 			{
 				try
 				{
-					boolean flag = true;
-					while(flag)
+					if(rc.isActive())
 					{
-                            int action = (rc.getRobot().getID()*rand.nextInt(101) + 50)%101;
-			
-                                                System.out.println("Action is "+action);
-						if (action < 1 && rc.getLocation().distanceSquaredTo(rc.senseHQLocation()) > 2) 
-							rc.construct(RobotType.PASTR);
-					
-                                                if(rc.canMove(dir[(count+((int)Math.random()*8))%8]))
+						//code to move the robot
+						int rand = rd.nextInt(8);
+						if(flag)
 						{
+							last = rd.nextInt(8);
 							flag = false;
-							rc.move(dir[(count+((int)Math.random()*8))%8]);
-							count = count++;
 						}
+						if(rc.canMove(dir[last]))
+						{
+							rc.move(dir[last]);
+						}
+						else if(rc.canMove(dir[rand%8]))
+	                    {
+							last = rand%8;
+							rc.move(dir[rand%8]);
+	                    }
 					}
-					
 				}
 				catch(Exception e)
 				{
-                                    //e.printStackTrace();
-					//System.out.println("Error Type 2");
+					System.out.println("Error Type 2");
 				}
 			}
 			rc.yield();
