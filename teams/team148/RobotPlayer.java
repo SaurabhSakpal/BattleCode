@@ -1,9 +1,6 @@
 package team148;
-
 import battlecode.common.*;
-
 import java.util.*;
-
 public class RobotPlayer
 {
     static Random rd = new Random();
@@ -15,25 +12,29 @@ public class RobotPlayer
 	{
 		while(true)
 		{
+			//checking if the current robot is of the type headquaters
 			if(rc.getType()==RobotType.HQ)
 			{
 				if(rc.isActive() && rc.senseRobotCount()<25)
 				{
-					int rand = rd.nextInt(100);
+					//if the headquater is active and if the total players created is lesser than certain limit then.... 
+					int rand = rd.nextInt(100); //create a RANDOM integer between 0(inclusive) and 100
 					try
 					{
-						MapLocation loc = rc.getLocation().add(dir[rand%8]);
-						GameObject go = rc.senseObjectAtLocation(loc);
+						MapLocation loc = rc.getLocation().add(dir[rand%8]); //get the location of the map pointed by direction selected by dir[rand%8]
+						GameObject go = rc.senseObjectAtLocation(loc); //is there any game object already present at that location
 						if(go==null)
 						{
-							System.out.println(rand%8);
-							rc.spawn(dir[rand%8]);
-						}
-                                                
+							//if the location is free
+							System.out.println(rand%8); //just for debugging
+							rc.spawn(dir[rand%8]); //create a robot/player at that location
+						}                                           
 						else if(go.getTeam()==rc.getTeam().opponent())
 						{
+							//else if the location is occupied and it has an opposite team object then shoot it.
 							if(rc.canAttackSquare(loc))
 							{
+								//but first we have to check if the tower is ready to attack
 								rc.attackSquare(loc);
 							}
 						}                           
@@ -50,20 +51,24 @@ public class RobotPlayer
 				{
 					if(rc.isActive())
 					{
+						//check if the player is active
 						//code to move the robot
-						int rand = rd.nextInt(8);
+						int rand = rd.nextInt(8); //generates a random integer
 						if(flag)
 						{
-							last = rd.nextInt(8);
+							//this code is only executed for the first time for any robot
+							last = rd.nextInt(8); 
 							flag = false;
 						}
 						if(rc.canMove(dir[last]))
 						{
+							//we give higher preference to the previous valid direction over others and if it is still valid to move in that direction then it moves or else it moves in some different direction 
 							rc.move(dir[last]);
 						}
 						else if(rc.canMove(dir[rand%8]))
 	                    {
-							last = rand%8;
+							//if can't move in the previous direction then selects randomly a new direction and moves in that direction
+							last = rand%8; //copies new direction to the last direction.
 							rc.move(dir[rand%8]);
 	                    }
 					}
@@ -73,7 +78,7 @@ public class RobotPlayer
 					System.out.println("Error Type 2");
 				}
 			}
-			rc.yield();
+			rc.yield(); //function used to end the round.
 		}
 		
 	}
